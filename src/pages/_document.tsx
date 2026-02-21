@@ -21,6 +21,12 @@ export default function Document() {
           href="https://fonts.googleapis.com/css2?family=Amarante&display=swap"
           rel="stylesheet"
         />
+        
+        {/* Bungee Spice */}
+        <link
+          href="https://fonts.googleapis.com/css2?family=Bungee+Spice&display=swap"
+          rel="stylesheet"
+        />
       </Head>
       <body>
         <Main />
