@@ -31,8 +31,6 @@ type Transaction = {
   transaction_items: TransactionItem[];
 };
 
-/* ================= PAGE ================= */
-
 export default function TransactionDetailPage() {
   useAuthGuard("user-only");
   const router = useRouter();
