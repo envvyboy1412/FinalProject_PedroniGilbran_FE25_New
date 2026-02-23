@@ -1,3 +1,4 @@
+import { toast, Toaster } from "sonner";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { Navbar } from "@/components/navbar";
@@ -5,11 +6,10 @@ import { Footer } from "@/components/footer";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 import {
   getTransactionById,
-  uploadTransactionProof,
   cancelTransaction,
+  updateTransactionProof,
 } from "@/services/transaction.service";
-
-/* ================= TYPES ================= */
+import { uploadImage } from "@/services/auth.service";
 
 type TransactionItem = {
   id: string;
@@ -41,7 +41,7 @@ export default function TransactionDetailPage() {
   const [error, setError] = useState("");
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
-
+  const [redirecting, setRedirecting] = useState(false);
 
   const fetchTransaction = async () => {
     try {
@@ -67,7 +67,6 @@ export default function TransactionDetailPage() {
     fetchTransaction();
   }, [id]);
 
-
   const handleUpload = async () => {
     if (!proofFile || !transaction) return;
 
@@ -77,153 +76,173 @@ export default function TransactionDetailPage() {
       const token = localStorage.getItem("token");
       if (!token) return;
 
-      await uploadTransactionProof({
+      const imageUrl = await uploadImage(proofFile);
+
+      await updateTransactionProof({
         token,
         transactionId: transaction.id,
-        file: proofFile,
+        imageUrl,
       });
 
-      alert("Bukti pembayaran berhasil diupload");
+      toast.success("Bukti pembayaran berhasil diupload");
+      setRedirecting(true);
+      setTimeout(() => {
+        router.replace("/user");
+      }, 3000);
       setProofFile(null);
       fetchTransaction();
     } catch (err: any) {
-      alert(err.message);
+      toast.error(err.message);
     } finally {
       setUploading(false);
     }
   };
 
-  const handleCancel = async () => {
-    if (!transaction) return;
-    if (!confirm("Batalkan transaksi?")) return;
+const handleCancel = () => {
+  if (!transaction) return;
 
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
+  toast("Batalkan transaksi?", {
+    description: "Transaksi yang dibatalkan tidak bisa dikembalikan.",
+    action: {
+      label: "Ya, Batalkan",
+      onClick: async () => {
+        try {
+          const token = localStorage.getItem("token");
+          if (!token) return;
 
-      await cancelTransaction({
-        token,
-        transactionId: transaction.id,
-      });
+          setRedirecting(true);
 
-      alert("Transaksi dibatalkan");
-      router.replace("/user");
-    } catch (err: any) {
-      alert(err.message);
-    }
-  };
+          await cancelTransaction({
+            token,
+            transactionId: transaction.id,
+          });
 
+          toast.success("Transaksi dibatalkan");
 
-return (
-  <div className="min-h-screen flex flex-col bg-[#3E3F29]">
-    <Navbar />
+          setTimeout(() => {
+            router.replace("/user");
+          }, 3000);
+        } catch (err: any) {
+          setRedirecting(false);
+          toast.error(err.message);
+        }
+      },
+    },
+    cancel: {
+      label: "Batal",
+      onClick: () => {},
+    },
+  });
+};
 
-    <main className="flex-1">
-      <div className="max-w-6xl mx-auto px-6 py-6">
-        <h1 className="text-2xl text-[#F1F0E4] font-bold mb-6">
-          Transaction Detail
-        </h1>
+  return (
+    <div className="min-h-screen flex flex-col bg-[#3E3F29]">
+      <Navbar />
+      <Toaster richColors position="top-center" />
 
-        {loading && <p>Loading...</p>}
-        {error && <p className="text-red-500">{error}</p>}
+      <main className="flex-1">
+        <div className="max-w-6xl mx-auto px-6 py-6">
+          <h1 className="text-2xl text-[#F1F0E4] font-bold mb-6">
+            Transaction Detail
+          </h1>
 
-        {!loading && transaction && (
-          <>
-            <div className="bg-[#7D8D86] text-[#F1F0E4] rounded-lg p-4 mb-6">
-              <p>
-                Status:{" "}
-                <strong>{transaction.status.toUpperCase()}</strong>
-              </p>
-              <p>Payment: {transaction.payment_method.name}</p>
-              <p>VA: {transaction.payment_method.virtualAccountNumber}</p>
-              <p>
-                Total: Rp{" "}
-                {transaction.totalAmount.toLocaleString("id-ID")}
-              </p>
-            </div>
+          {loading && <p>Loading...</p>}
+          {error && <p className="text-red-500">{error}</p>}
 
-            <div className="space-y-4 mb-6">
-              {transaction.transaction_items.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex gap-4 text-[#F1F0E4] bg-[#7D8D86] p-3 rounded"
-                >
-                  <img
-                    src={item.imageUrl}
-                    className="w-16 h-16 rounded"
+          {!loading && transaction && (
+            <>
+              <div className="bg-[#7D8D86] text-[#F1F0E4] rounded-lg p-4 mb-6">
+                <p>
+                  Status: <strong>{transaction.status.toUpperCase()}</strong>
+                </p>
+                <p>Payment: {transaction.payment_method.name}</p>
+                <p>VA: {transaction.payment_method.virtualAccountNumber}</p>
+                <p>
+                  Total: Rp {transaction.totalAmount.toLocaleString("id-ID")}
+                </p>
+              </div>
+
+              <div className="space-y-4 mb-6">
+                {transaction.transaction_items.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex gap-4 text-[#F1F0E4] bg-[#7D8D86] p-3 rounded"
+                  >
+                    <img src={item.imageUrl} className="w-16 h-16 rounded" />
+                    <div>
+                      <p className="font-semibold">{item.name}</p>
+                      <p className="text-sm">
+                        {item.quantity} × Rp{" "}
+                        {item.price.toLocaleString("id-ID")}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {transaction.status === "pending" && (
+                <>
+                  <input
+                    id="proof"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setProofFile(e.target.files?.[0] || null)}
+                    className="hidden"
                   />
-                  <div>
-                    <p className="font-semibold">{item.name}</p>
-                    <p className="text-sm">
-                      {item.quantity} × Rp{" "}
-                      {item.price.toLocaleString("id-ID")}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
 
-            {transaction.status === "pending" && (
-              <>
-                <input
-                  id="proof"
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) =>
-                    setProofFile(e.target.files?.[0] || null)
-                  }
-                  className="hidden"
-                />
-
-                <label
-                  htmlFor="proof"
-                  className="inline-block cursor-pointer bg-[#A89276] hover:bg-[#BCA88D] text-white px-4 py-2 rounded"
-                >
-                  {proofFile
-                    ? "Ganti Bukti Pembayaran"
-                    : "Pilih Bukti Pembayaran"}
-                </label>
-
-                {proofFile && (
-                  <div className="mt-4">
-                    <p className="text-sm text-[#F1F0E4] mb-2">
-                      Preview Bukti Pembayaran:
-                    </p>
-                    <img
-                      src={URL.createObjectURL(proofFile)}
-                      alt="Preview bukti pembayaran"
-                      className="w-40 h-40 object-cover rounded border border-[#A89276]"
-                    />
-                  </div>
-                )}
-
-                <div className="flex gap-4 mt-4">
-                  <button
-                    onClick={handleUpload}
-                    disabled={!proofFile || uploading}
-                    className="bg-[#A89276] hover:bg-[#BCA88D] text-white px-4 py-2 rounded disabled:opacity-50"
+                  <label
+                    htmlFor="proof"
+                    className="inline-block cursor-pointer bg-[#A89276] hover:bg-[#BCA88D] text-white px-4 py-2 rounded"
                   >
-                    {uploading ? "Uploading..." : "Upload Proof"}
-                  </button>
+                    {proofFile
+                      ? "Ganti Bukti Pembayaran"
+                      : "Pilih Bukti Pembayaran"}
+                  </label>
 
-                  <button
-                    onClick={handleCancel}
-                    className="bg-red-500 hover:bg-red-400 text-white px-4 py-2 rounded"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </>
-            )}
-          </>
-        )}
-      </div>
-    </main>
+                  {proofFile && (
+                    <div className="mt-4">
+                      <p className="text-sm text-[#F1F0E4] mb-2">
+                        Preview Bukti Pembayaran:
+                      </p>
+                      <img
+                        src={URL.createObjectURL(proofFile)}
+                        alt="Preview bukti pembayaran"
+                        className="w-40 h-40 object-cover rounded border border-[#A89276]"
+                      />
+                    </div>
+                  )}
 
-    <Footer />
-  </div>
-);
+                  <div className="flex gap-4 mt-4">
+                    <button
+                      onClick={handleUpload}
+                      disabled={!proofFile || uploading}
+                      className="bg-[#A89276] hover:bg-[#BCA88D] text-white px-4 py-2 rounded disabled:opacity-50"
+                    >
+                      {uploading ? "Uploading..." : "Upload Proof"}
+                    </button>
 
+                    <button
+                      onClick={handleCancel}
+                      className="bg-red-500 hover:bg-red-400 text-white px-4 py-2 rounded"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                  {redirecting && (
+                    <div className="fixed inset-0 bg-white/60 z-50 flex items-center justify-center">
+                      <div className="text-white text-lg font-semibold animate-pulse">
+                        Mengalihkan halaman...
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+            </>
+          )}
+        </div>
+      </main>
 
-
+      <Footer />
+    </div>
+  );
 }

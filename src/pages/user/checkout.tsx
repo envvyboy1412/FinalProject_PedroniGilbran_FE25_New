@@ -119,8 +119,6 @@ export default function CheckoutPage() {
     }
   };
 
-  /* ================= UI ================= */
-
   return (
     <div className="min-h-screen flex flex-col bg-[#3E3F29]">
       <Navbar />

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
+import Picture from "@/components/pictures";
 
 type FoodCardProps = {
   loading?: boolean;
@@ -56,7 +57,7 @@ export function FoodCard(props: FoodCardProps) {
   const [quantity, setQuantity] = useState(1);
   const router = useRouter();
 
-  if (!id || !name || !imageUrl || rating === undefined) {
+  if (!id || !name || rating === undefined) {
     return null;
   }
 
@@ -73,7 +74,6 @@ export function FoodCard(props: FoodCardProps) {
 
   return (
     <div className="border-0 rounded-xl overflow-hidden shadow-sm bg-[#7D8D86] flex flex-col relative">
-      {/* Like/Unlike */}
       {!isAdmin && (
         <button
           onClick={onToggleLike}
@@ -83,19 +83,17 @@ export function FoodCard(props: FoodCardProps) {
         </button>
       )}
 
-      {/* Image */}
       <div
         onClick={goToDetail}
         className="w-full h-48  bg-gray-100 cursor-pointer"
       >
-        <img
+        <Picture
           src={imageUrl}
           alt={name}
           className="w-full h-full object-cover"
         />
       </div>
 
-      {/* Content */}
       <div className="p-4 flex flex-col gap-3 flex-1">
         <h3
           onClick={goToDetail}
@@ -123,7 +121,6 @@ export function FoodCard(props: FoodCardProps) {
 
         <div className="flex-1" />
 
-        {/* Button Action */}
         {!isAdmin && onAddToCart && (
           <div className="flex items-center justify-between gap-3">
             <div className="flex bg-[#A89276] items-center rounded-lg overflow-hidden">

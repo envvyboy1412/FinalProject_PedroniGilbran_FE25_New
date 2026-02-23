@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Navbar } from "../../components/navbar";
 import { FoodCard } from "../../components/food/foodcard";
 import { Footer } from "@/components/footer";
@@ -14,29 +14,38 @@ import { toast, Toaster } from "sonner";
 type Food = {
   id: string;
   name: string;
-  price: number
+  price: number;
   imageUrl: string;
   rating: number;
   isLike: boolean;
 };
 
+const BATCH_SIZE = 6;
+
 export default function FoodListPage() {
-  // admin & user boleh masuk
   useAuthGuard();
 
   const [foods, setFoods] = useState<Food[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [allFoods, setAllFoods] = useState<Food[]>([]);
+  const [visibleCount, setVisibleCount] = useState(BATCH_SIZE);
+  const [loading, setLoading] = useState(false);
+  const [isBatchLoading, setIsBatchLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Fetch Foodlist
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+
   useEffect(() => {
     const fetchFoods = async () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) return;
 
+        setLoading(true);
+
         const data = await getFoods({ token });
-        setFoods(data);
+
+        setAllFoods(data);
+        setFoods(data.slice(0, BATCH_SIZE));
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -47,31 +56,51 @@ export default function FoodListPage() {
     fetchFoods();
   }, []);
 
-  //Tombol Tambah Cart
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (
+          entries[0].isIntersecting &&
+          visibleCount < allFoods.length &&
+          !isBatchLoading
+        ) {
+          setIsBatchLoading(true);
+
+          setTimeout(() => {
+            const nextCount = visibleCount + 3;
+            setFoods(allFoods.slice(0, nextCount));
+            setVisibleCount(nextCount);
+            setIsBatchLoading(false);
+          }, 400);
+        }
+      },
+      { threshold: 1 },
+    );
+
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [visibleCount, allFoods, isBatchLoading]);
+
   const handleAddToCart = async (data: {
     foodId: string;
     quantity: number;
   }) => {
-    try { 
+    try {
       const token = localStorage.getItem("token");
       if (!token) return;
 
-      //Ambil cart terbaru
       const carts = await getCarts({ token });
 
-      //Cek apakah food sudah ada di cart
       const existingCart = carts.find(
         (item: any) => item.food.id === data.foodId,
       );
 
       if (!existingCart) {
-        /**
-         * Jika BELUM ADA
-         * - add cart (backend bikin quantity = 1)
-         */
         await addToCart(data.foodId, 1, { token });
 
-        // ambil ulang cart
         const updatedCarts = await getCarts({ token });
 
         const newCartItem = updatedCarts.find(
@@ -82,63 +111,43 @@ export default function FoodListPage() {
           throw new Error("Cart item tidak ditemukan");
         }
 
-        // set quantity sesuai pilihan user
         await updateCartQuantity(newCartItem.id, data.quantity, { token });
       } else {
-        /**
-         * Jika SUDAH ADA
-         * - jumlahkan quantity
-         */
         const totalQuantity = existingCart.quantity + data.quantity;
-
         await updateCartQuantity(existingCart.id, totalQuantity, { token });
       }
 
-      toast.success("Item Telah ditambahkan", {
-        duration: 3000,
-      });
+      toast.success("Item berhasil ditambahkan ke cart");
     } catch (err: any) {
-      toast.error(err.message || "Gagal menambahkan ke cart", {
-        duration: 3000,
-      });
+      toast.error(err.message || "Gagal menambahkan ke cart");
     }
   };
 
-  //Tombol Like & Unlike
-const handleToggleLike = async (foodId: string, isLike: boolean) => {
-  setFoods((prev) =>
-    prev.map((food) =>
-      food.id === foodId ? { ...food, isLike: !isLike } : food,
-    ),
-  );
-
-  try {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
-    if (!isLike) {
-      await likeFood(foodId, { token });
-    } else {
-      await unlikeFood(foodId, { token });
-    }
-    toast.success(
-      !isLike ? "Ditambahkan ke favorite ❤️" : "Dihapus dari favorite 🤍",
-      {
-        duration: 2000,
-      },
-    );
-  } catch (error) {
+  const handleToggleLike = async (foodId: string, isLike: boolean) => {
     setFoods((prev) =>
-      prev.map((food) => (food.id === foodId ? { ...food, isLike } : food)),
+      prev.map((food) =>
+        food.id === foodId ? { ...food, isLike: !isLike } : food,
+      ),
     );
 
-    toast.error("Gagal mengubah status favorite", {
-      duration: 3000,
-    });
-  }
-};
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
 
-  /* ================= UI ================= */
+      if (!isLike) {
+        await likeFood(foodId, { token });
+      } else {
+        await unlikeFood(foodId, { token });
+      }
+    } catch {
+      setFoods((prev) =>
+        prev.map((food) => (food.id === foodId ? { ...food, isLike } : food)),
+      );
+
+      toast.error("Gagal mengubah favorite");
+    }
+  };
+
   return (
     <div className="bg-[#3E3F29] min-h-screen flex flex-col">
       <Navbar />
@@ -148,34 +157,39 @@ const handleToggleLike = async (foodId: string, isLike: boolean) => {
 
         {error && <p className="text-red-500">{error}</p>}
 
-        {/* Skeleton */}
-        {loading && (
-          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Array.from({ length: 6 }).map((_, index) => (
+        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {foods.map((food) => (
+            <FoodCard
+              key={food.id}
+              id={food.id}
+              name={food.name}
+              price={food.price}
+              imageUrl={food.imageUrl}
+              rating={food.rating}
+              isLike={food.isLike}
+              onToggleLike={() => handleToggleLike(food.id, food.isLike)}
+              onAddToCart={handleAddToCart}
+            />
+          ))}
+        </ul>
+
+        {isBatchLoading && (
+          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+            {Array.from({ length: BATCH_SIZE }).map((_, index) => (
               <FoodCard key={index} loading />
             ))}
           </ul>
         )}
 
-        {/* FoodCard & Data */}
-        {!loading && !error && (
-          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {foods.map((food) => (
-              <FoodCard
-                key={food.id}
-                id={food.id}
-                name={food.name}
-                price={food.price}
-                imageUrl={food.imageUrl}
-                rating={food.rating}
-                isLike={food.isLike}
-                onToggleLike={() => handleToggleLike(food.id, food.isLike)}
-                onAddToCart={handleAddToCart}
-              />
-            ))}
-          </ul>
-        )}
+        <div
+          ref={loadMoreRef}
+          className="h-12 flex justify-center items-center mt-6"
+        >
+          {loading && <p className="text-white">Loading...</p>}
+          {visibleCount >= allFoods.length && <p className="text-gray-400"></p>}
+        </div>
       </main>
+
       <Footer />
       <Toaster position="top-center" richColors />
     </div>

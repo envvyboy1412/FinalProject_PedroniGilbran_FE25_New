@@ -10,6 +10,8 @@ import {
 } from "@/services/cart.service";
 import { getFoodRatings, submitFoodRating } from "@/services/rating.service";
 import { Footer } from "@/components/footer";
+import Picture from "@/components/pictures";
+import { toast, Toaster } from "sonner";
 
 type FoodDetail = {
   id: string;
@@ -49,7 +51,6 @@ export default function FoodDetailPage() {
 
   const isAdmin =
     typeof window !== "undefined" && localStorage.getItem("role") === "admin";
-
 
   useEffect(() => {
     if (!id) return;
@@ -93,7 +94,6 @@ export default function FoodDetailPage() {
     }
   };
 
-
 const handleAddToCart = async (data: {
   foodId: string;
   quantity: number;
@@ -102,22 +102,15 @@ const handleAddToCart = async (data: {
     const token = localStorage.getItem("token");
     if (!token) return;
 
-    // 1️⃣ Ambil cart terbaru
     const carts = await getCarts({ token });
 
-    // 2️⃣ Cek apakah food sudah ada di cart
     const existingCart = carts.find(
       (item: any) => item.food.id === data.foodId
     );
 
     if (!existingCart) {
-      /**
-       * 3️⃣ Jika BELUM ADA
-       * - add cart (backend bikin quantity = 1)
-       */
       await addToCart(data.foodId, 1, { token });
 
-      // ambil ulang cart
       const updatedCarts = await getCarts({ token });
 
       const newCartItem = updatedCarts.find(
@@ -128,17 +121,12 @@ const handleAddToCart = async (data: {
         throw new Error("Cart item tidak ditemukan");
       }
 
-      // set quantity sesuai pilihan user
       await updateCartQuantity(
         newCartItem.id,
         data.quantity,
         { token }
       );
     } else {
-      /**
-       * 4️⃣ Jika SUDAH ADA
-       * - jumlahkan quantity
-       */
       const totalQuantity =
         existingCart.quantity + data.quantity;
 
@@ -149,12 +137,11 @@ const handleAddToCart = async (data: {
       );
     }
 
-    alert("Berhasil ditambahkan ke cart");
+    toast.success("Berhasil ditambahkan ke cart");
   } catch (err: any) {
-    alert(err.message);
+    toast.error(err?.message || "Gagal menambahkan ke cart");
   }
 };
-
 
   const handleSubmitRating = async () => {
     if (!food || userRating === 0 || isAdmin) return;
@@ -207,7 +194,7 @@ const handleAddToCart = async (data: {
 
       <main className="max-w-6xl mx-auto px-6 py-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-6 rounded-2xl border-0 shadow-lg shadow-[#7D8D86] bg-[#7D8D86]">
-          <img
+          <Picture
             src={food.imageUrl}
             alt={food.name}
             className="w-full h-80 object-cover rounded-lg"
@@ -215,7 +202,9 @@ const handleAddToCart = async (data: {
 
           <div>
             <div className="flex items-center gap-32 md:gap-72">
-              <h1 className="text-3xl text-[#F1F0E4] font-bold">{food.name}</h1>
+              <h1 className="text-3xl text-[#F1F0E4] font-bold">
+                {food.name}
+              </h1>
 
               {!isAdmin && (
                 <button onClick={handleToggleLike} className="text-3xl">
@@ -276,7 +265,9 @@ const handleAddToCart = async (data: {
                   key={star}
                   onClick={() => setUserRating(star)}
                   className={`text-3xl ${
-                    star <= userRating ? "text-yellow-500" : "text-[#F1F0E4]"
+                    star <= userRating
+                      ? "text-yellow-500"
+                      : "text-[#F1F0E4]"
                   }`}
                 >
                   ★
@@ -310,14 +301,19 @@ const handleAddToCart = async (data: {
           ) : (
             <div className="space-y-4">
               {reviews.map((r) => (
-                <div key={r.id} className="border rounded-lg bg-[#F1F0E4] p-4">
+                <div
+                  key={r.id}
+                  className="border rounded-lg bg-[#F1F0E4] p-4"
+                >
                   <strong className="font-medium font-Bungee">
                     {r.user.name}
                   </strong>{" "}
                   <span className="text-yellow-500">
                     {"★".repeat(r.rating)}
                   </span>
-                  <p className="text-black font-bold mt-1">{r.review || "-"}</p>
+                  <p className="text-black font-bold mt-1">
+                    {r.review || "-"}
+                  </p>
                 </div>
               ))}
             </div>
@@ -325,6 +321,7 @@ const handleAddToCart = async (data: {
         </section>
       </main>
       <Footer />
+      <Toaster position="top-center" richColors />
     </div>
   );
 }

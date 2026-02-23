@@ -3,7 +3,6 @@ type LoginPayload = {
   password: string;
 };
 
-
 // Login
 export async function loginUser(payload: LoginPayload) {
   const response = await fetch(
@@ -15,14 +14,14 @@ export async function loginUser(payload: LoginPayload) {
         apiKey: process.env.NEXT_PUBLIC_API_KEY as string,
       },
       body: JSON.stringify(payload),
-    }
+    },
   );
 
   const data = await response.json();
 
   if (!response.ok) {
     throw new Error(
-      data?.message || data?.error || "Email atau password salah"
+      data?.message || data?.error || "Email atau password salah",
     );
   }
 
@@ -45,16 +44,22 @@ export async function uploadImage(file: File): Promise<string> {
         apiKey: process.env.NEXT_PUBLIC_API_KEY as string,
       },
       body: formData,
-    }
+    },
   );
 
   const data = await res.json();
 
-  if (!res.ok || data.status !== "OK") {
+  if (!res.ok || data?.status !== "OK") {
     throw new Error(data?.message || "Upload image gagal");
   }
 
-  return data.url;
+  const imageUrl = data?.data?.imageUrl ?? data?.url ?? data?.data?.url ?? null;
+
+  if (!imageUrl) {
+    throw new Error("Image URL tidak valid");
+  }
+
+  return imageUrl;
 }
 
 // Register
@@ -78,7 +83,7 @@ export async function registerUser(payload: RegisterPayload) {
         apiKey: process.env.NEXT_PUBLIC_API_KEY as string,
       },
       body: JSON.stringify(payload),
-    }
+    },
   );
 
   const data = await res.json();

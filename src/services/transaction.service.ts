@@ -1,8 +1,5 @@
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
-const API_KEY = process.env.NEXT_PUBLIC_API_KEY as string;
-
 const authHeaders = (token: string) => ({
-  apiKey: API_KEY,
+  apiKey: process.env.NEXT_PUBLIC_API_KEY as string,
   Authorization: `Bearer ${token}`,
 });
 
@@ -13,25 +10,26 @@ export async function createTransaction(params: {
   cartIds: string[];
   paymentMethodId: string;
 }) {
-  const res = await fetch(`${BASE_URL}/api/v1/create-transaction`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...authHeaders(params.token),
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/create-transaction`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...authHeaders(params.token),
+      },
+      body: JSON.stringify({
+        cartIds: params.cartIds,
+        paymentMethodId: params.paymentMethodId,
+      }),
     },
-    body: JSON.stringify({
-      cartIds: params.cartIds,
-      paymentMethodId: params.paymentMethodId,
-    }),
-  });
+  );
 
   const json = await res.json();
 
   if (!res.ok) {
     throw new Error(
-      json?.errors?.[0]?.message ||
-        json?.message ||
-        "Gagal membuat transaksi"
+      json?.errors?.[0]?.message || json?.message || "Gagal membuat transaksi",
     );
   }
 
@@ -41,9 +39,12 @@ export async function createTransaction(params: {
 //Get My Transaction API
 
 export async function getMyTransactions(token: string) {
-  const res = await fetch(`${BASE_URL}/api/v1/my-transactions`, {
-    headers: authHeaders(token),
-  });
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/my-transactions`,
+    {
+      headers: authHeaders(token),
+    },
+  );
 
   const json = await res.json();
 
@@ -54,19 +55,16 @@ export async function getMyTransactions(token: string) {
   return json.data;
 }
 
-// Sortir Trasanction 
+// Sortir Trasanction
 
 export async function getLatestPendingTransaction(token: string) {
   const transactions = await getMyTransactions(token);
 
   const pending = transactions
-    .filter(
-      (trx: any) => trx.status?.toLowerCase() === "pending"
-    )
+    .filter((trx: any) => trx.status?.toLowerCase() === "pending")
     .sort(
       (a: any, b: any) =>
-        new Date(b.createdAt).getTime() -
-        new Date(a.createdAt).getTime()
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     );
 
   if (pending.length === 0) {
@@ -83,10 +81,10 @@ export async function getTransactionById(params: {
   transactionId: string;
 }) {
   const res = await fetch(
-    `${BASE_URL}/api/v1/transaction/${params.transactionId}`,
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/transaction/${params.transactionId}`,
     {
       headers: authHeaders(params.token),
-    }
+    },
   );
 
   const json = await res.json();
@@ -100,30 +98,33 @@ export async function getTransactionById(params: {
 
 // Upload Proof Transaction API
 
-export async function uploadTransactionProof(params: {
+export async function updateTransactionProof(params: {
   token: string;
   transactionId: string;
-  file: File;
+  imageUrl: string;
 }) {
-  const formData = new FormData();
-  formData.append("image", params.file);
-
   const res = await fetch(
-    `${BASE_URL}/api/v1/update-transaction-proof-payment/${params.transactionId}`,
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/update-transaction-proof-payment/${params.transactionId}`,
     {
       method: "POST",
-      headers: authHeaders(params.token),
-      body: formData,
-    }
+      headers: {
+        Authorization: `Bearer ${params.token}`,
+        apiKey: process.env.NEXT_PUBLIC_API_KEY as string,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        proofPaymentUrl: params.imageUrl,
+      }),
+    },
   );
 
-  const json = await res.json();
+  const data = await res.json();
 
   if (!res.ok) {
-    throw new Error(json.message || "Upload bukti gagal");
+    throw new Error(data?.message || "Update bukti pembayaran gagal");
   }
 
-  return json;
+  return data;
 }
 
 // Cancel Transaction API
@@ -133,11 +134,11 @@ export async function cancelTransaction(params: {
   transactionId: string;
 }) {
   const res = await fetch(
-    `${BASE_URL}/api/v1/cancel-transaction/${params.transactionId}`,
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/cancel-transaction/${params.transactionId}`,
     {
       method: "POST",
       headers: authHeaders(params.token),
-    }
+    },
   );
 
   const json = await res.json();

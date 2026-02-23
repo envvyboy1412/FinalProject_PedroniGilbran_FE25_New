@@ -4,16 +4,13 @@ type FetchOptions = {
 
 //Get Carts API
 export async function getCarts({ token }: FetchOptions) {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/carts`,
-    {
-      headers: {
-        "Content-Type": "application/json",
-        apiKey: process.env.NEXT_PUBLIC_API_KEY as string,
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/carts`, {
+    headers: {
+      "Content-Type": "application/json",
+      apiKey: process.env.NEXT_PUBLIC_API_KEY as string,
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
   const data = await res.json();
 
@@ -28,7 +25,7 @@ export async function getCarts({ token }: FetchOptions) {
 export async function addToCart(
   foodId: string,
   quantity: number,
-  { token }: FetchOptions
+  { token }: FetchOptions,
 ) {
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/add-cart`,
@@ -40,13 +37,17 @@ export async function addToCart(
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ foodId, quantity }),
-    }
+    },
   );
 
   const data = await res.json();
 
   if (!res.ok) {
     throw new Error(data.message || "Gagal add to cart");
+  }
+
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("cart-updated"));
   }
 
   return data.data;
@@ -56,7 +57,7 @@ export async function addToCart(
 export async function updateCartQuantity(
   cartId: string,
   quantity: number,
-  { token }: FetchOptions
+  { token }: FetchOptions,
 ) {
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/update-cart/${cartId}`,
@@ -68,7 +69,7 @@ export async function updateCartQuantity(
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ quantity }),
-    }
+    },
   );
 
   const data = await res.json();
@@ -77,14 +78,15 @@ export async function updateCartQuantity(
     throw new Error(data.message || "Gagal update quantity");
   }
 
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("cart-updated"));
+  }
+
   return data;
 }
 
 // Delete Cart API
-export async function deleteCart(
-  cartId: string,
-  { token }: FetchOptions
-) {
+export async function deleteCart(cartId: string, { token }: FetchOptions) {
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/delete-cart/${cartId}`,
     {
@@ -93,13 +95,17 @@ export async function deleteCart(
         apiKey: process.env.NEXT_PUBLIC_API_KEY as string,
         Authorization: `Bearer ${token}`,
       },
-    }
+    },
   );
 
   const data = await res.json();
 
   if (!res.ok) {
     throw new Error(data.message || "Gagal menghapus item cart");
+  }
+
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("cart-updated"));
   }
 
   return data;

@@ -1,3 +1,5 @@
+import Picture from "@/components/pictures";
+
 type TransactionItem = {
   id: string;
   name: string;
@@ -6,7 +8,7 @@ type TransactionItem = {
 
 type Transaction = {
   id: string;
-  status: "pending" | "success" | "canceled";
+  status: "pending" | "success" | "cancelled";
   totalAmount: number;
   createdAt: string;
   payment_method: {
@@ -37,29 +39,23 @@ export function TransactionCard({ transaction }: Props) {
         transition
       "
     >
-      {/* Ordr Details */}
       <div className="flex gap-4 items-center">
-        {item?.imageUrl && (
-          <img
-            src={item.imageUrl}
-            alt={item.name}
-            className="w-16 h-16 text-[#F1F0E4] rounded-lg object-cover border"
-          />
-        )}
+        <Picture
+          src={item?.imageUrl}
+          alt={item?.name}
+          className="w-16 h-16 text-[#F1F0E4] rounded-lg object-cover border"
+        />
 
         <div>
           <p className="font-extrabold text-[#F1F0E4]">
             #{transaction.id.slice(0, 8)}
           </p>
           <p className="text-sm text-[#F1F0E4]">
-            {new Date(transaction.createdAt).toLocaleDateString(
-              "id-ID",
-              {
-                day: "2-digit",
-                month: "long",
-                year: "numeric",
-              }
-            )}
+            {new Date(transaction.createdAt).toLocaleDateString("id-ID", {
+              day: "2-digit",
+              month: "long",
+              year: "numeric",
+            })}
           </p>
           <p className="text-sm text-[#F1F0E4]">
             {transaction.payment_method.name}
@@ -67,7 +63,6 @@ export function TransactionCard({ transaction }: Props) {
         </div>
       </div>
 
-      {/* Status transaction */}
       <div className="flex items-center gap-2">
         <span
           className={`w-2.5 h-2.5 rounded-full ${
@@ -87,7 +82,6 @@ export function TransactionCard({ transaction }: Props) {
         </span>
       </div>
 
-      {/* TOTAL */}
       <div className="font-semibold text-[#F1F0E4] md:text-right">
         Rp {transaction.totalAmount.toLocaleString("id-ID")}
       </div>
