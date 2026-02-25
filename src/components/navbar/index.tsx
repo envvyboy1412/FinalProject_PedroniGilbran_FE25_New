@@ -180,7 +180,7 @@ export function Navbar() {
                 <p className="text-xs text-gray-500">{user?.role}</p>
               </div>
 
-              {/* Tombol khusus ADMIN */}
+              {/* Menu Admin*/}
               {isAdmin && (
                 <Link
                   href="/admin"

@@ -27,6 +27,13 @@ export default function AdminFoodPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
+  const totalPages = Math.ceil(foods.length / itemsPerPage);
+
+  const paginatedFoods = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return foods.slice(start, start + itemsPerPage);
+  }, [foods, currentPage]);
+
   const fetchFoods = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -63,19 +70,12 @@ export default function AdminFoodPage() {
           }
         },
       },
-     cancel: {
-      label: "Batal",
-      onClick: () => {},
-    },
-  });
-};
-
-  const totalPages = Math.ceil(foods.length / itemsPerPage);
-
-  const paginatedFoods = useMemo(() => {
-    const start = (currentPage - 1) * itemsPerPage;
-    return foods.slice(start, start + itemsPerPage);
-  }, [foods, currentPage]);
+      cancel: {
+        label: "Batal",
+        onClick: () => {},
+      },
+    });
+  };
 
   return (
     <main className="min-h-screen bg-[#3E3F29] p-6">

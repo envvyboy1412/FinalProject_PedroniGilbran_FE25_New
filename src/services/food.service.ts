@@ -124,7 +124,7 @@ type AdminFetchOptions = {
   token: string;
 };
 
-// CREATE FOOD
+// Creat Food
 export async function adminCreateFood(
   payload: {
     name: string;
@@ -157,7 +157,7 @@ export async function adminCreateFood(
   return data;
 }
 
-// UPDATE FOOD
+// Update Food
 export async function adminUpdateFood(
   foodId: string,
   payload: {
@@ -191,7 +191,7 @@ export async function adminUpdateFood(
   return data;
 }
 
-// DELETE FOOD
+// Delete Food
 export async function adminDeleteFood(
   foodId: string,
   { token }: AdminFetchOptions

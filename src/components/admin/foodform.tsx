@@ -32,7 +32,7 @@ export default function FoodForm({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // PREFILL SAAT EDIT
+  // untuk modal edit(update)
   useEffect(() => {
     if (mode === "edit" && initialData) {
       setName(initialData.name);
@@ -71,7 +71,7 @@ export default function FoodForm({
 
       let imageUrl = initialData?.imageUrl || "";
 
-      // ⬇️ UPLOAD IMAGE DULU JIKA ADA FILE BARU
+      // Buat update gambar, jika gambar baru
       if (image) {
         imageUrl = await uploadImage(image);
       }
@@ -110,7 +110,7 @@ export default function FoodForm({
 
         {error && <p className="mb-3 text-sm text-red-500">{error}</p>}
 
-        {/* NAME */}
+        {/* Nama Food */}
         <div className="mb-3">
           <label className="mb-1 block text-sm ">Nama</label>
           <input
@@ -122,7 +122,7 @@ export default function FoodForm({
           />
         </div>
 
-        {/* DESCRIPTION */}
+        {/* Deskripsi */}
         <div className="mb-3">
           <label className="mb-1 block text-sm">Deskripsi</label>
           <textarea
@@ -134,7 +134,7 @@ export default function FoodForm({
           />
         </div>
 
-        {/* INGREDIENTS */}
+        {/* Ingredients */}
         <div className="mb-3">
           <label className="mb-1 block text-sm">
             Ingredients (pisahkan dengan koma)
@@ -148,7 +148,7 @@ export default function FoodForm({
           />
         </div>
 
-        {/* PRICE */}
+        {/* Harga */}
         <div className="mb-3">
           <label className="mb-1 block text-sm">Harga</label>
           <input
@@ -160,7 +160,7 @@ export default function FoodForm({
           />
         </div>
 
-        {/* IMAGE */}
+        {/* Gambar */}
         <div className="mb-4">
           <label className="mb-2 block text-sm">
             Tambah Gambar {mode === "edit" && "(opsional)"}
@@ -192,7 +192,7 @@ export default function FoodForm({
             className="hidden"
           />
         </div>
-        {/* ACTION */}
+        {/* Action */}
         <div className="flex justify-end gap-2">
           <button
             type="button"
