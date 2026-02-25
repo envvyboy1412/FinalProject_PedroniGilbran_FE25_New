@@ -1,30 +1,44 @@
 import { useAuthGuard } from "@/hooks/useAuthGuard";
+import { logout } from "@/services/logout.service";
 import { useRouter } from "next/router";
+import { toast, ToastContainer } from "react-toastify";
 
 export default function AdminDashboardPage() {
   useAuthGuard("admin-only");
   const router = useRouter();
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    router.replace("/login");
+  // Button Logout
+  const handleLogout = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+      await logout(token);
+    } catch (error) {
+      console.log("Logout error:", error);
+    } finally {
+      localStorage.clear();
+      toast.success("Logout berhasil");
+
+      setTimeout(() => {
+        router.replace("/login");
+      }, 3000);
+    }
   };
 
   return (
     <main className="min-h-screen bg-[#3E3F29] flex items-center justify-center px-4">
+      <ToastContainer theme="dark" />
       <div className="bg-white rounded-xl shadow-md p-8 max-w-md w-full text-center">
         <h1 className="text-2xl font-bold mb-2">Admin Dashboard</h1>
-        <p className="text-gray-600 mb-6">
-          Selamat datang di halaman admin.
-        </p>
+        <p className="text-gray-600 mb-6">Selamat datang di halaman admin.</p>
 
         <div className="space-y-3">
           <button
-            onClick={() => alert("Menu User Management (coming soon)")}
+            onClick={() => router.push("/admin/foods")}
             className="w-full bg-black text-white py-2 rounded"
           >
-            User Management
+            Add New Food
           </button>
 
           <button

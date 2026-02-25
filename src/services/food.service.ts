@@ -116,3 +116,102 @@ export async function getFavoriteFoods({ token }: { token: string }) {
 
   return data.data;
 }
+
+
+// ================= ADMIN FOOD API =================
+
+type AdminFetchOptions = {
+  token: string;
+};
+
+// CREATE FOOD
+export async function adminCreateFood(
+  payload: {
+    name: string;
+    description: string;
+    ingredients: string[];
+    price: number;
+    imageUrl: string;
+  },
+  { token }: { token: string }
+) {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/create-food`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        apiKey: process.env.NEXT_PUBLIC_API_KEY as string,
+      },
+      body: JSON.stringify(payload),
+    }
+  );
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data?.message || "Gagal menambah food");
+  }
+
+  return data;
+}
+
+// UPDATE FOOD
+export async function adminUpdateFood(
+  foodId: string,
+  payload: {
+    name: string;
+    description: string;
+    ingredients: string[];
+    price: number;
+    imageUrl: string;
+  },
+  { token }: { token: string }
+) {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/update-food/${foodId}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        apiKey: process.env.NEXT_PUBLIC_API_KEY as string,
+      },
+      body: JSON.stringify(payload),
+    }
+  );
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data?.message || "Gagal update food");
+  }
+
+  return data;
+}
+
+// DELETE FOOD
+export async function adminDeleteFood(
+  foodId: string,
+  { token }: AdminFetchOptions
+) {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/delete-food/${foodId}`,
+    {
+      method: "DELETE",
+      headers: {
+        apiKey: process.env.NEXT_PUBLIC_API_KEY as string,
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.message || "Gagal hapus food");
+  }
+
+  return result.data;
+}

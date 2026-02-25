@@ -28,33 +28,32 @@ export function Navbar() {
   };
 
   // Fetch User
-useEffect(() => {
-  const token = localStorage.getItem("token");
-  if (!token) return;
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
 
-  const fetchUserProfile = async () => {
-    try {
-      const user = await getMyProfile(token);
-      setUser(user);
-    } catch (error) {
-      console.log("Fetch user error:", error);
-    }
-  };
+    const fetchUserProfile = async () => {
+      try {
+        const user = await getMyProfile(token);
+        setUser(user);
+      } catch (error) {
+        console.log("Fetch user error:", error);
+      }
+    };
 
-  fetchUserProfile();
-}, []);
+    fetchUserProfile();
+  }, []);
 
-//notif cart
-useEffect(() => {
-  fetchCartCount();
+  //notif cart
+  useEffect(() => {
+    fetchCartCount();
 
-  window.addEventListener("cart-updated", fetchCartCount);
+    window.addEventListener("cart-updated", fetchCartCount);
 
-  return () => {
-    window.removeEventListener("cart-updated", fetchCartCount);
-  };
-}, []);
-
+    return () => {
+      window.removeEventListener("cart-updated", fetchCartCount);
+    };
+  }, []);
 
   // Button Logout
   const handleLogout = async () => {
@@ -74,7 +73,6 @@ useEffect(() => {
       }, 2000);
     }
   };
-
 
   return (
     <nav className="bg-[#7D8D86] relative z-50">
@@ -182,6 +180,17 @@ useEffect(() => {
                 <p className="text-xs text-gray-500">{user?.role}</p>
               </div>
 
+              {/* Tombol khusus ADMIN */}
+              {isAdmin && (
+                <Link
+                  href="/admin"
+                  className="block px-4 py-2 hover:bg-gray-100"
+                >
+                  Dashboard
+                </Link>
+              )}
+
+              {/* Menu USER */}
               {!isAdmin && (
                 <Link
                   href="/user/history"
