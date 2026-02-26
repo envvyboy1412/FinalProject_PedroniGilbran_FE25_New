@@ -6,7 +6,7 @@ import { getMyProfile, updateProfile } from "@/services/user.service";
 import { Toaster, toast } from "sonner";
 
 export default function ProfilePage() {
-  useAuthGuard("user-only");
+  useAuthGuard();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");

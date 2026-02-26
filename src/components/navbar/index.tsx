@@ -200,7 +200,7 @@ export function Navbar() {
                 </Link>
               )}
 
-              {!isAdmin && (
+              {isAdmin && (
                 <Link
                   href="/user/edit-profile"
                   className="block px-4 py-2 hover:bg-gray-100"

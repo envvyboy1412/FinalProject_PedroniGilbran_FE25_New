@@ -57,3 +57,50 @@ export async function updateProfile(params: {
 
   return json;
 }
+
+
+// ================= ADMIN Role API =================
+
+// Get All Users (Admin)
+export async function adminGetAllUsers(token: string) {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/all-user`,
+    {
+      headers: authHeaders(token),
+    },
+  );
+
+  const json = await res.json();
+
+  if (!res.ok) {
+    throw new Error(json.message || "Gagal mengambil data user");
+  }
+
+  return json.data || json.users;
+}
+
+// Update User Role (Admin)
+export async function adminUpdateUserRole(params: {
+  token: string;
+  userId: string;
+  role: "admin";
+}) {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/update-user-role/${params.userId}`,
+    {
+      method: "POST",
+      headers: authHeaders(params.token),
+      body: JSON.stringify({
+        role: params.role,
+      }),
+    },
+  );
+
+  const json = await res.json();
+
+  if (!res.ok) {
+    throw new Error(json.message || "Gagal update role user");
+  }
+
+  return json;
+}
