@@ -8,7 +8,8 @@ type TransactionItem = {
 
 type Transaction = {
   id: string;
-  status: "pending" | "success" | "cancelled";
+  invoiceId: string;
+  status: "pending" | "success" | "cancelled" | "failed";
   totalAmount: number;
   createdAt: string;
   payment_method: {
@@ -25,20 +26,7 @@ export function TransactionCard({ transaction }: Props) {
   const item = transaction.transaction_items?.[0];
 
   return (
-    <div
-      className="
-        bg-[#7D8D86]
-        rounded-xl
-        shadow-sm
-        p-5
-        grid
-        gap-4
-        md:grid-cols-4
-        md:items-center
-        hover:shadow-md
-        transition
-      "
-    >
+    <div className="bg-[#7D8D86] rounded-xl shadow-sm p-5 grid gap-4 md:grid-cols-[2fr_1fr_1fr_auto] md:items-center hover:shadow-md transition">
       <div className="flex gap-4 items-center">
         <Picture
           src={item?.imageUrl}
@@ -47,8 +35,8 @@ export function TransactionCard({ transaction }: Props) {
         />
 
         <div>
-          <p className="font-extrabold text-[#F1F0E4]">
-            #{transaction.id.slice(0, 8)}
+          <p className="font-sans text-[#F1F0E4]">
+            {transaction.invoiceId}
           </p>
           <p className="text-sm text-[#F1F0E4]">
             {new Date(transaction.createdAt).toLocaleDateString("id-ID", {
@@ -69,16 +57,20 @@ export function TransactionCard({ transaction }: Props) {
             transaction.status === "pending"
               ? "bg-yellow-500"
               : transaction.status === "success"
-              ? "bg-green-500"
-              : "bg-red-500"
+                ? "bg-green-500"
+                : transaction.status === "failed"
+                  ? "bg-red-600"
+                  : "bg-gray-400"
           }`}
         />
         <span className="text-sm font-medium">
           {transaction.status === "pending"
             ? "Pending"
             : transaction.status === "success"
-            ? "Delivered"
-            : "Cancelled"}
+              ? "Success"
+              : transaction.status === "failed"
+                ? "Failed"
+                : "Cancelled"}
         </span>
       </div>
 

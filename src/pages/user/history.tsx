@@ -7,7 +7,8 @@ import { TransactionCard } from "@/components/transaction/transactioncard";
 
 type Transaction = {
   id: string;
-  status: "pending" | "success" | "cancelled";
+  invoiceId: string;
+  status: "pending" | "success" | "cancelled" | "failed";
   totalAmount: number;
   createdAt: string;
   payment_method: {
@@ -22,16 +23,13 @@ export default function HistoryPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // FILTER STATE
   const [statusFilter, setStatusFilter] = useState<
-    "all" | "pending" | "success" | "cancelled"
+    "all" | "pending" | "success" | "cancelled" | "failed"
   >("all");
 
-  // PAGINATION
   const ITEMS_PER_PAGE = 5;
   const [currentPage, setCurrentPage] = useState(1);
 
-  // FILTERED DATA
   const filteredTransactions =
     statusFilter === "all"
       ? transactions
@@ -70,7 +68,6 @@ export default function HistoryPage() {
 
       <main className="flex-1">
         <div className="max-w-6xl mx-auto px-6 py-8">
-          {/* TITLE + FILTER */}
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl text-[#F1F0E4] font-bold">
               My Transactions
@@ -85,7 +82,8 @@ export default function HistoryPage() {
                       | "all"
                       | "pending"
                       | "success"
-                      | "cancelled",
+                      | "cancelled"
+                      | "failed",
                   );
                   setCurrentPage(1);
                 }}
@@ -95,9 +93,9 @@ export default function HistoryPage() {
                 <option value="pending">Pending</option>
                 <option value="success">Success</option>
                 <option value="cancelled">Canceled</option>
+                <option value="failed">Failed</option>
               </select>
 
-              {/* Custom arrow */}
               <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-[#3E3F29]">
                 <svg
                   className="w-4 h-4"
@@ -116,8 +114,7 @@ export default function HistoryPage() {
             </div>
           </div>
 
-          {/* TABLE HEADER */}
-          <div className="hidden md:grid md:grid-cols-4 text-sm font-bold text-[#F1F0E4] mb-3 px-6">
+          <div className="hidden md:grid md:grid-cols-[2fr_1fr_1fr_auto] text-sm font-bold text-[#F1F0E4] mb-3 px-6">
             <span>ORDER DETAILS</span>
             <span>STATUS</span>
             <span className="text-right">TOTAL</span>
@@ -132,7 +129,6 @@ export default function HistoryPage() {
             </div>
           )}
 
-          {/* PAGINATION */}
           {totalPages > 1 && (
             <div className="flex justify-between items-center mt-8">
               <p className="text-sm text-[#F1F0E4]">

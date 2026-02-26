@@ -149,3 +149,58 @@ export async function cancelTransaction(params: {
 
   return json;
 }
+
+
+// ================= ADMIN Transaction API =================
+
+
+// Get All Transactions (Admin)
+export async function adminGetAllTransactions(token: string) {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/all-transactions`,
+    {
+      headers: authHeaders(token),
+    },
+  );
+
+  const json = await res.json();
+
+  if (!res.ok) {
+    throw new Error(json.message || "Gagal mengambil semua transaksi");
+  }
+
+  return json.data;
+}
+
+// Update Transaction Status (Admin)
+export async function adminUpdateTransactionStatus(params: {
+  token: string;
+  transactionId: string;
+  status: "success" | "failed";
+}) {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/update-transaction-status/${params.transactionId}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...authHeaders(params.token),
+      },
+      body: JSON.stringify({
+        status: params.status,
+      }),
+    },
+  );
+
+  const json = await res.json();
+
+  if (!res.ok) {
+    throw new Error(
+      json.errors ||
+        json.message ||
+        "Gagal mengubah status transaksi",
+    );
+  }
+
+  return json;
+}
