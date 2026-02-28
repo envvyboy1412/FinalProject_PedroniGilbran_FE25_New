@@ -16,6 +16,7 @@ type TransactionItem = {
   name: string;
   quantity: number;
   price: number;
+  subtotal: number;
   imageUrl: string;
 };
 
@@ -98,42 +99,42 @@ export default function TransactionDetailPage() {
     }
   };
 
-const handleCancel = () => {
-  if (!transaction) return;
+  const handleCancel = () => {
+    if (!transaction) return;
 
-  toast("Batalkan transaksi?", {
-    description: "Transaksi yang dibatalkan tidak bisa dikembalikan.",
-    action: {
-      label: "Ya, Batalkan",
-      onClick: async () => {
-        try {
-          const token = localStorage.getItem("token");
-          if (!token) return;
+    toast("Batalkan transaksi?", {
+      description: "Transaksi yang dibatalkan tidak bisa dikembalikan.",
+      action: {
+        label: "Ya, Batalkan",
+        onClick: async () => {
+          try {
+            const token = localStorage.getItem("token");
+            if (!token) return;
 
-          setRedirecting(true);
+            setRedirecting(true);
 
-          await cancelTransaction({
-            token,
-            transactionId: transaction.id,
-          });
+            await cancelTransaction({
+              token,
+              transactionId: transaction.id,
+            });
 
-          toast.success("Transaksi dibatalkan");
+            toast.success("Transaksi dibatalkan");
 
-          setTimeout(() => {
-            router.replace("/user");
-          }, 3000);
-        } catch (err: any) {
-          setRedirecting(false);
-          toast.error(err.message);
-        }
+            setTimeout(() => {
+              router.replace("/user");
+            }, 3000);
+          } catch (err: any) {
+            setRedirecting(false);
+            toast.error(err.message);
+          }
+        },
       },
-    },
-    cancel: {
-      label: "Batal",
-      onClick: () => {},
-    },
-  });
-};
+      cancel: {
+        label: "Batal",
+        onClick: () => {},
+      },
+    });
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-[#3E3F29]">
@@ -158,7 +159,9 @@ const handleCancel = () => {
                 <p>Payment: {transaction.payment_method.name}</p>
                 <p>VA: {transaction.payment_method.virtualAccountNumber}</p>
                 <p>
-                  Total: Rp {transaction.totalAmount.toLocaleString("id-ID")}
+                  <p>
+                    Harga: Rp {transaction.totalAmount.toLocaleString("id-ID")}
+                  </p>
                 </p>
               </div>
 
@@ -171,10 +174,7 @@ const handleCancel = () => {
                     <img src={item.imageUrl} className="w-16 h-16 rounded" />
                     <div>
                       <p className="font-semibold">{item.name}</p>
-                      <p className="text-sm">
-                        {item.quantity} × Rp{" "}
-                        {item.price.toLocaleString("id-ID")}
-                      </p>
+                      <p className="text-sm">Jumlah: {item.quantity} item</p>
                     </div>
                   </div>
                 ))}

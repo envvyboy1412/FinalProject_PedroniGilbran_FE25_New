@@ -117,7 +117,7 @@ export default function HistoryPage() {
           <div className="hidden md:grid md:grid-cols-[2fr_1fr_1fr_auto] text-sm font-bold text-[#F1F0E4] mb-3 px-6">
             <span>ORDER DETAILS</span>
             <span>STATUS</span>
-            <span className="text-right">TOTAL</span>
+            <span className="text-right">HARGA</span>
             <span />
           </div>
 
