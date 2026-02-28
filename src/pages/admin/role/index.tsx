@@ -57,40 +57,37 @@ export default function AdminUsersPage() {
   }, []);
 
   const confirmPromote = (user: User) => {
-    toast(
-      `Jadikan ${user.name} sebagai admin?`,
-      {
-        action: {
-          label: "Ya, Jadikan Admin",
-          onClick: async () => {
-            try {
-              const token = localStorage.getItem("token");
-              if (!token) return;
+    toast(`Jadikan ${user.name} sebagai admin?`, {
+      action: {
+        label: "Ya, Jadikan Admin",
+        onClick: async () => {
+          try {
+            const token = localStorage.getItem("token");
+            if (!token) return;
 
-              await adminUpdateUserRole({
-                token,
-                userId: user.id,
-                role: "admin",
-              });
+            await adminUpdateUserRole({
+              token,
+              userId: user.id,
+              role: "admin",
+            });
 
-              setUsers((prev) =>
-                prev.filter((u) => u.id !== user.id)
-              );
+            setUsers((prev) =>
+              prev.filter((u) => u.id !== user.id)
+            );
 
-              toast.success("Role berhasil diubah menjadi admin");
-            } catch (err: any) {
-              toast.error(
-                err.message || "Gagal mengubah role user"
-              );
-            }
-          },
+            toast.success("Role berhasil diubah menjadi admin");
+          } catch (err: any) {
+            toast.error(
+              err.message || "Gagal mengubah role user"
+            );
+          }
         },
+      },
       cancel: {
         label: "Batal",
         onClick: () => {},
       },
-      }
-    );
+    });
   };
 
   const filteredUsers = useMemo(() => {
@@ -117,14 +114,14 @@ export default function AdminUsersPage() {
   }, [search]);
 
   return (
-    <main className="min-h-screen bg-[#3E3F29] p-6">
-      <div className="mx-auto max-w-6xl rounded-2xl bg-[#7D8D86] p-6 shadow-2xl">
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+    <main className="min-h-screen bg-[#3E3F29] p-4 md:p-6">
+      <div className="mx-auto max-w-6xl rounded-2xl bg-[#7D8D86] p-4 md:p-6 shadow-2xl">
+        <div className="mb-6 flex flex-col md:flex-row gap-3 justify-between">
           <h1 className="text-xl font-semibold text-[#F1F0E4]">
             Manajemen User
           </h1>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <input
               type="text"
               placeholder="Cari nama atau email..."
@@ -135,7 +132,7 @@ export default function AdminUsersPage() {
 
             <button
               onClick={() => router.push("/admin")}
-              className="rounded-lg bg-[#F1F0E4] px-4 py-2 text-sm font-semibold text-[#3A2F24] hover:bg-[#BCA88D] transition"
+              className="rounded-lg bg-[#F1F0E4] px-4 py-2 text-sm font-semibold text-[#3A2F24]"
             >
               Kembali
             </button>
@@ -152,7 +149,36 @@ export default function AdminUsersPage() {
           </p>
         ) : (
           <>
-            <div className="overflow-hidden rounded-xl border border-gray-200">
+            <div className="block md:hidden space-y-4">
+              {paginatedUsers.map((user) => (
+                <div
+                  key={user.id}
+                  className="rounded-xl bg-[#3E3F29] p-4 text-[#F1F0E4]"
+                >
+                  <div className="space-y-1 text-sm">
+                    <p className="font-semibold">{user.name}</p>
+                    <p>{user.email}</p>
+                  </div>
+
+                  <div className="mt-3 flex justify-end">
+                    {user.id !== myUserId ? (
+                      <button
+                        onClick={() => confirmPromote(user)}
+                        className="rounded-lg bg-green-100 px-3 py-1 text-sm text-green-700"
+                      >
+                        Set Admin
+                      </button>
+                    ) : (
+                      <span className="text-gray-400 text-sm">
+                        -
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="hidden md:block overflow-hidden rounded-xl border border-gray-200">
               <table className="w-full text-sm">
                 <thead className="bg-gray-50 text-gray-600">
                   <tr>
@@ -170,10 +196,7 @@ export default function AdminUsersPage() {
 
                 <tbody className="divide-y divide-gray-100">
                   {paginatedUsers.map((user) => (
-                    <tr
-                      key={user.id}
-                      className="hover:bg-[#BCA88D] transition"
-                    >
+                    <tr key={user.id}>
                       <td className="px-5 py-4 font-medium text-[#F1F0E4]">
                         {user.name}
                       </td>
@@ -188,7 +211,7 @@ export default function AdminUsersPage() {
                             onClick={() =>
                               confirmPromote(user)
                             }
-                            className="rounded-lg bg-green-100 px-3 py-1 text-green-700 hover:bg-green-200 transition"
+                            className="rounded-lg bg-green-100 px-3 py-1 text-green-700"
                           >
                             Set Admin
                           </button>
@@ -204,7 +227,7 @@ export default function AdminUsersPage() {
               </table>
             </div>
 
-            <div className="mt-4 flex items-center justify-between text-sm text-[#F1F0E4]">
+            <div className="mt-4 flex flex-col md:flex-row items-center justify-between gap-3 text-sm text-[#F1F0E4]">
               <p>
                 Page {currentPage} of {totalPages}
               </p>
@@ -215,12 +238,12 @@ export default function AdminUsersPage() {
                   onClick={() =>
                     setCurrentPage((p) => p - 1)
                   }
-                  className="rounded-lg bg-[#F1F0E4] px-3 py-1 text-black hover:bg-[#BCA88D] disabled:opacity-40"
+                  className="rounded-lg bg-[#F1F0E4] px-3 py-1 text-black disabled:opacity-40"
                 >
                   ‹
                 </button>
 
-                <div className="rounded-lg border bg-[#3E3F29] px-4 py-1 font-medium text-white">
+                <div className="rounded-lg bg-[#3E3F29] px-4 py-1 text-white">
                   {currentPage}
                 </div>
 
@@ -229,7 +252,7 @@ export default function AdminUsersPage() {
                   onClick={() =>
                     setCurrentPage((p) => p + 1)
                   }
-                  className="rounded-lg bg-[#F1F0E4] px-3 py-1 text-black hover:bg-[#BCA88D] disabled:opacity-40"
+                  className="rounded-lg bg-[#F1F0E4] px-3 py-1 text-black disabled:opacity-40"
                 >
                   ›
                 </button>

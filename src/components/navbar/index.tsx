@@ -27,7 +27,6 @@ export function Navbar() {
     setCartCount(total);
   };
 
-  // Fetch User
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
@@ -44,18 +43,14 @@ export function Navbar() {
     fetchUserProfile();
   }, []);
 
-  //notif cart
   useEffect(() => {
     fetchCartCount();
-
     window.addEventListener("cart-updated", fetchCartCount);
-
     return () => {
       window.removeEventListener("cart-updated", fetchCartCount);
     };
   }, []);
 
-  // Button Logout
   const handleLogout = async () => {
     const token = localStorage.getItem("token");
     if (!token) return;
@@ -67,7 +62,6 @@ export function Navbar() {
     } finally {
       localStorage.clear();
       toast.success("Logout berhasil");
-
       setTimeout(() => {
         router.replace("/login");
       }, 2000);
@@ -84,61 +78,9 @@ export function Navbar() {
         </div>
 
         <div className="hidden md:flex gap-12 text-white font-semibold">
-          <Link
-            href="/user"
-            className="relative
-          before:content-[''] before:absolute before:left-0 before:bottom-0
-          before:h-0.5 before:w-0 before:bg-[#A6A6A6]
-          before:transition-[width] before:duration-800
-          before:ease-[cubic-bezier(0.68,-0.55,0.265,1.55)]
-
-          after:content-[''] after:absolute after:right-0 after:bottom-0
-          after:h-0.5 after:w-0 after:bg-[#A6A6A6]
-          after:transition-[width] after:duration-800
-          after:ease-[cubic-bezier(0.68,-0.55,0.265,1.55)]
-
-          hover:before:w-full hover:after:w-full"
-          >
-            Home
-          </Link>
-
-          <Link
-            href="/user/foodlist"
-            className="relative
-          before:content-[''] before:absolute before:left-0 before:bottom-0
-          before:h-0.5 before:w-0 before:bg-[#A6A6A6]
-          before:transition-[width] before:duration-800
-          before:ease-[cubic-bezier(0.68,-0.55,0.265,1.55)]
-
-          after:content-[''] after:absolute after:right-0 after:bottom-0
-          after:h-0.5 after:w-0 after:bg-[#A6A6A6]
-          after:transition-[width] after:duration-800
-          after:ease-[cubic-bezier(0.68,-0.55,0.265,1.55)]
-
-          hover:before:w-full hover:after:w-full"
-          >
-            Food
-          </Link>
-
-          {!isAdmin && (
-            <Link
-              href="/user/favorite"
-              className="relative
-            before:content-[''] before:absolute before:left-0 before:bottom-0
-            before:h-0.5 before:w-0 before:bg-[#A6A6A6]
-            before:transition-[width] before:duration-800
-            before:ease-[cubic-bezier(0.68,-0.55,0.265,1.55)]
-
-            after:content-[''] after:absolute after:right-0 after:bottom-0
-            after:h-0.5 after:w-0 after:bg-[#A6A6A6]
-            after:transition-[width] after:duration-800
-            after:ease-[cubic-bezier(0.68,-0.55,0.265,1.55)]
-
-            hover:before:w-full hover:after:w-full"
-            >
-              Favorite
-            </Link>
-          )}
+          <Link href="/user">Home</Link>
+          <Link href="/user/foodlist">Food</Link>
+          {!isAdmin && <Link href="/user/favorite">Favorite</Link>}
         </div>
 
         <div className="hidden md:flex items-center gap-6 relative">
@@ -168,7 +110,6 @@ export function Navbar() {
                 {user?.name?.charAt(0)?.toUpperCase() || "U"}
               </div>
             )}
-
             <span className="hidden md:block text-sm font-semibold">
               {user?.name}
             </span>
@@ -180,7 +121,6 @@ export function Navbar() {
                 <p className="text-xs text-gray-500">{user?.role}</p>
               </div>
 
-              {/* Menu Admin*/}
               {isAdmin && (
                 <Link
                   href="/admin"
@@ -190,7 +130,6 @@ export function Navbar() {
                 </Link>
               )}
 
-              {/* Menu USER */}
               {!isAdmin && (
                 <Link
                   href="/user/history"
@@ -200,14 +139,12 @@ export function Navbar() {
                 </Link>
               )}
 
-              {isAdmin && (
-                <Link
-                  href="/user/edit-profile"
-                  className="block px-4 py-2 hover:bg-gray-100"
-                >
-                  Edit Profile
-                </Link>
-              )}
+              <Link
+                href="/user/edit-profile"
+                className="block px-4 py-2 hover:bg-gray-100"
+              >
+                Edit Profile
+              </Link>
 
               <button
                 onClick={handleLogout}
@@ -230,25 +167,11 @@ export function Navbar() {
       {menuOpen && (
         <div className="md:hidden bg-[#ACBAC4] border-t">
           <div className="flex flex-col gap-4 p-6 text-white font-semibold">
-            <Link href="/user" onClick={() => setMenuOpen(false)}>
-              Home
-            </Link>
-            <Link href="/user/foodlist" onClick={() => setMenuOpen(false)}>
-              Food
-            </Link>
-
+            <Link href="/user">Home</Link>
+            <Link href="/user/foodlist">Food</Link>
+            {!isAdmin && <Link href="/user/favorite">Favorite</Link>}
             {!isAdmin && (
-              <Link href="/user/favorite" onClick={() => setMenuOpen(false)}>
-                Favorite
-              </Link>
-            )}
-
-            {!isAdmin && (
-              <Link
-                href="/user/cart"
-                onClick={() => setMenuOpen(false)}
-                className="flex items-center gap-2"
-              >
+              <Link href="/user/cart" className="flex items-center gap-2">
                 Cart
                 {cartCount > 0 && (
                   <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
@@ -260,20 +183,9 @@ export function Navbar() {
 
             <hr className="border-white/40" />
 
-            {!isAdmin && (
-              <Link href="/user/history" onClick={() => setMenuOpen(false)}>
-                History
-              </Link>
-            )}
-
-            {!isAdmin && (
-              <Link
-                href="/user/edit-profile"
-                onClick={() => setMenuOpen(false)}
-              >
-                Edit Profile
-              </Link>
-            )}
+            {isAdmin && <Link href="/admin">Dashboard</Link>}
+            {!isAdmin && <Link href="/user/history">History</Link>}
+            <Link href="/user/edit-profile">Edit Profile</Link>
 
             <button onClick={handleLogout} className="text-left text-red-200">
               Logout

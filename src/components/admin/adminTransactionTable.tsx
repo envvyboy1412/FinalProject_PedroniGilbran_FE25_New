@@ -29,25 +29,68 @@ export default function AdminTransactionTable({
 
   return (
     <>
-      {/* Tabel */}
-      <div className="overflow-hidden rounded-xl border border-gray-200">
+      <div className="block md:hidden space-y-4">
+        {transactions.map((trx) => (
+          <div
+            key={trx.id}
+            className="rounded-xl bg-[#3E3F29] p-4 text-[#F1F0E4]"
+          >
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold">{trx.invoiceId}</p>
+              <p>{trx.payment_method?.name || "-"}</p>
+              <p>
+                Rp {trx.totalAmount.toLocaleString("id-ID")}
+              </p>
+              <span
+                className={`inline-block rounded px-2 py-1 text-xs font-semibold ${
+                  trx.status === "pending"
+                    ? "bg-yellow-200 text-yellow-800"
+                    : trx.status === "success"
+                    ? "bg-green-200 text-green-800"
+                    : "bg-red-200 text-red-800"
+                }`}
+              >
+                {trx.status}
+              </span>
+            </div>
+
+            <div className="mt-3 flex justify-end">
+              <button
+                onClick={() => setSelectedTransaction(trx)}
+                className="rounded-lg bg-blue-100 px-3 py-1 text-sm text-blue-700"
+              >
+                Detail
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="hidden md:block overflow-hidden rounded-xl border border-gray-200">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 text-gray-600">
             <tr>
-              <th className="px-5 py-3 text-left font-medium">Invoice</th>
-              <th className="px-5 py-3 text-left font-medium">Metode</th>
-              <th className="px-5 py-3 text-left font-medium">Total</th>
-              <th className="px-5 py-3 text-left font-medium">Status</th>
-              <th className="px-5 py-3 text-center font-medium">Action</th>
+              <th className="px-5 py-3 text-left font-medium">
+                Invoice
+              </th>
+              <th className="px-5 py-3 text-left font-medium">
+                Metode
+              </th>
+              <th className="px-5 py-3 text-left font-medium">
+                Total
+              </th>
+              <th className="px-5 py-3 text-left font-medium">
+                Status
+              </th>
+              <th className="px-5 py-3 text-center font-medium">
+                Action
+              </th>
             </tr>
           </thead>
 
           <tbody className="divide-y divide-gray-100">
             {transactions.map((trx) => (
-              <tr
-                key={trx.id}
-                className="hover:bg-[#BCA88D] transition"
-              >
+              <tr key={trx.id}>
                 <td className="px-5 py-4 font-medium text-[#F1F0E4]">
                   {trx.invoiceId}
                 </td>
@@ -77,7 +120,7 @@ export default function AdminTransactionTable({
                 <td className="px-5 py-4 text-center">
                   <button
                     onClick={() => setSelectedTransaction(trx)}
-                    className="rounded-lg bg-blue-100 px-3 py-1 text-blue-700 hover:bg-blue-200 transition"
+                    className="rounded-lg bg-blue-100 px-3 py-1 text-blue-700"
                   >
                     Detail
                   </button>
@@ -88,10 +131,9 @@ export default function AdminTransactionTable({
         </table>
       </div>
 
-      {/* Modal */}
       {selectedTransaction && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#3E3F29]/90">
-          <div className="w-full max-w-md rounded-xl bg-[#7D8D86] p-6 text-[#F1F0E4] shadow-lg">
+          <div className="w-full max-w-md mx-4 rounded-xl bg-[#7D8D86] p-6 text-[#F1F0E4]">
             <h2 className="mb-4 text-lg font-semibold">
               Detail Transaksi
             </h2>
@@ -105,8 +147,7 @@ export default function AdminTransactionTable({
                 {selectedTransaction.payment_method?.name || "-"}
               </p>
               <p>
-                <b>Total:</b>{" "}
-                Rp{" "}
+                <b>Total:</b> Rp{" "}
                 {selectedTransaction.totalAmount.toLocaleString(
                   "id-ID"
                 )}
@@ -120,8 +161,7 @@ export default function AdminTransactionTable({
               {selectedTransaction.proofPaymentUrl ? (
                 <img
                   src={selectedTransaction.proofPaymentUrl}
-                  alt="Bukti Pembayaran"
-                  className="h-48 w-full rounded-lg object-cover border"
+                  className="h-48 w-full rounded-lg object-cover"
                 />
               ) : (
                 <p className="text-sm text-gray-300">
@@ -139,7 +179,7 @@ export default function AdminTransactionTable({
                       "success"
                     )
                   }
-                  className="flex-1 rounded bg-green-600 py-2 text-sm text-white hover:bg-green-700 transition"
+                  className="flex-1 rounded bg-green-600 py-2 text-sm text-white"
                 >
                   Approved
                 </button>
@@ -151,7 +191,7 @@ export default function AdminTransactionTable({
                       "failed"
                     )
                   }
-                  className="flex-1 rounded bg-red-600 py-2 text-sm text-white hover:bg-red-700 transition"
+                  className="flex-1 rounded bg-red-600 py-2 text-sm text-white"
                 >
                   Reject
                 </button>
@@ -160,7 +200,7 @@ export default function AdminTransactionTable({
 
             <button
               onClick={() => setSelectedTransaction(null)}
-              className="w-full rounded bg-gray-400 py-2 text-sm text-white hover:bg-gray-500 transition"
+              className="w-full rounded bg-gray-400 py-2 text-sm text-white"
             >
               Tutup
             </button>

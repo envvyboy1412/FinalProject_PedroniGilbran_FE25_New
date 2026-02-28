@@ -32,7 +32,6 @@ export default function FoodForm({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // untuk modal edit(update)
   useEffect(() => {
     if (mode === "edit" && initialData) {
       setName(initialData.name);
@@ -71,7 +70,6 @@ export default function FoodForm({
 
       let imageUrl = initialData?.imageUrl || "";
 
-      // Buat update gambar, jika gambar baru
       if (image) {
         imageUrl = await uploadImage(image);
       }
@@ -102,7 +100,7 @@ export default function FoodForm({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#3E3F29]/90">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-md rounded-xl text-[#F1F0E4] bg-[#7D8D86] p-6 shadow-lg"
+        className="w-full max-w-md mx-4 rounded-xl bg-[#7D8D86] p-6 text-[#F1F0E4]"
       >
         <h2 className="mb-4 text-lg font-semibold">
           {mode === "edit" ? "Edit Food" : "Tambah Food"}
@@ -110,94 +108,57 @@ export default function FoodForm({
 
         {error && <p className="mb-3 text-sm text-red-500">{error}</p>}
 
-        {/* Nama Food */}
-        <div className="mb-3">
-          <label className="mb-1 block text-sm ">Nama</label>
-          <input
-            type="text"
-            placeholder="Nama Makanan"
-            className="w-full rounded  px-3 py-2 bg-[#F1F0E4] text-[#BCA88D] font-semibold"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </div>
+        <input
+          className="w-full mb-3 rounded px-3 py-2 bg-[#F1F0E4] text-[#BCA88D]"
+          placeholder="Nama Makanan"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
 
-        {/* Deskripsi */}
-        <div className="mb-3">
-          <label className="mb-1 block text-sm">Deskripsi</label>
-          <textarea
-            className="w-full rounded border px-3 py-2 bg-[#F1F0E4] text-[#BCA88D] font-semibold"
-            placeholder="Deskripsi Makanan"
-            rows={3}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-        </div>
+        <textarea
+          className="w-full mb-3 rounded px-3 py-2 bg-[#F1F0E4] text-[#BCA88D]"
+          placeholder="Deskripsi"
+          rows={3}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
 
-        {/* Ingredients */}
-        <div className="mb-3">
-          <label className="mb-1 block text-sm">
-            Ingredients (pisahkan dengan koma)
-          </label>
-          <input
-            type="text"
-            placeholder="Ingredients"
-            className="w-full rounded border px-3 py-2 bg-[#F1F0E4] text-[#BCA88D] font-semibold"
-            value={ingredients}
-            onChange={(e) => setIngredients(e.target.value)}
-          />
-        </div>
+        <input
+          className="w-full mb-3 rounded px-3 py-2 bg-[#F1F0E4] text-[#BCA88D]"
+          placeholder="Ingredients"
+          value={ingredients}
+          onChange={(e) => setIngredients(e.target.value)}
+        />
 
-        {/* Harga */}
-        <div className="mb-3">
-          <label className="mb-1 block text-sm">Harga</label>
-          <input
-            type="number"
-            placeholder="Harga"
-            className="w-full rounded border px-3 py-2 bg-[#F1F0E4] text-[#BCA88D] font-semibold"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-          />
-        </div>
+        <input
+          type="number"
+          className="w-full mb-3 rounded px-3 py-2 bg-[#F1F0E4] text-[#BCA88D]"
+          placeholder="Harga"
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
+        />
 
-        {/* Gambar */}
-        <div className="mb-4">
-          <label className="mb-2 block text-sm">
-            Tambah Gambar {mode === "edit" && "(opsional)"}
-          </label>
-
-          <label
-            htmlFor="image"
-            className="flex h-40 w-full cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100"
-          >
+        <label className="block mb-4 cursor-pointer">
+          <div className="h-40 rounded-lg border-2 border-dashed bg-gray-50 flex items-center justify-center">
             {preview ? (
-              <img
-                src={preview}
-                alt="Preview"
-                className="h-full w-full rounded-lg object-cover"
-              />
+              <img src={preview} className="h-full w-full object-cover rounded-lg" />
             ) : (
-              <div className="text-center text-sm text-gray-500">
-                <p className="font-medium">Upload gambar</p>
-                <p className="text-xs">PNG, JPG, JPEG</p>
-              </div>
+              <span className="text-gray-500 text-sm">Upload Gambar</span>
             )}
-          </label>
-
+          </div>
           <input
-            id="image"
             type="file"
+            className="hidden"
             accept="image/*"
             onChange={(e) => handleImageChange(e.target.files?.[0] || null)}
-            className="hidden"
           />
-        </div>
-        {/* Action */}
+        </label>
+
         <div className="flex justify-end gap-2">
           <button
             type="button"
             onClick={onCancel}
-            className="rounded bg-red-600 px-4 py-2 text-sm text-white transition hover:bg-red-700 active:scale-95 active:bg-red-800 active:shadow-inner"
+            className="px-4 py-2 rounded bg-red-600 text-white"
           >
             Batal
           </button>
@@ -205,7 +166,7 @@ export default function FoodForm({
           <button
             type="submit"
             disabled={loading}
-            className="rounded bg-green-600 px-4 py-2 text-sm text-white transition hover:bg-green-700 active:scale-95 active:bg-green-800 active:shadow-inner disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 rounded bg-green-600 text-white disabled:opacity-50"
           >
             {loading ? "Menyimpan..." : "Simpan"}
           </button>
