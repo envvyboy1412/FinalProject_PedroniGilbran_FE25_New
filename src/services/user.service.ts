@@ -25,27 +25,23 @@ export async function updateProfile(params: {
   name: string;
   email: string;
   phoneNumber: string;
-  profilePicture?: File | null;
+  profilePictureUrl?: string;
 }) {
-  const formData = new FormData();
-
-  formData.append("name", params.name);
-  formData.append("email", params.email);
-  formData.append("phoneNumber", params.phoneNumber);
-
-  if (params.profilePicture) {
-    formData.append("profilePicture", params.profilePicture);
-  }
-
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/update-profile`,
     {
       method: "POST",
       headers: {
+        "Content-Type": "application/json",
         apiKey: process.env.NEXT_PUBLIC_API_KEY as string,
         Authorization: `Bearer ${params.token}`,
       },
-      body: formData,
+      body: JSON.stringify({
+        name: params.name,
+        email: params.email,
+        phoneNumber: params.phoneNumber,
+        profilePictureUrl: params.profilePictureUrl,
+      }),
     },
   );
 

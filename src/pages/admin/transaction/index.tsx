@@ -31,6 +31,7 @@ export default function AdminTransactionPage() {
   const [filterStatus, setFilterStatus] = useState<
     "all" | "pending" | "success" | "failed"
   >("all");
+
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 7;
 
@@ -114,6 +115,13 @@ export default function AdminTransactionPage() {
     setCurrentPage(1);
   }, [filterStatus]);
 
+  const tabClass = (status: typeof filterStatus) =>
+    `px-4 py-2 rounded-lg text-sm font-semibold transition ${
+      filterStatus === status
+        ? "bg-[#3E3F29] text-[#F1F0E4]"
+        : "bg-[#F1F0E4] text-[#3A2F24] hover:bg-opacity-80"
+    }`;
+
   return (
     <main className="min-h-screen bg-[#3E3F29] p-4 md:p-6">
       <div className="mx-auto max-w-6xl rounded-2xl bg-[#7D8D86] p-4 md:p-6">
@@ -122,25 +130,39 @@ export default function AdminTransactionPage() {
             Manajemen Transaksi
           </h1>
 
-          <div className="flex gap-2 flex-wrap">
-            <button
-              onClick={() => router.push("/admin")}
-              className="rounded-lg bg-[#F1F0E4] px-4 py-2 text-sm font-semibold text-[#3A2F24]"
-            >
-              Kembali
-            </button>
+          <button
+            onClick={() => router.push("/admin")}
+            className="rounded-lg bg-[#F1F0E4] px-4 py-2 text-sm font-semibold text-[#3A2F24]"
+          >
+            Kembali
+          </button>
+        </div>
 
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value as any)}
-              className="rounded-lg bg-[#F1F0E4] px-4 py-2 text-sm font-semibold text-[#3A2F24]"
-            >
-              <option value="all">Semua</option>
-              <option value="pending">Pending</option>
-              <option value="success">Success</option>
-              <option value="failed">Failed</option>
-            </select>
-          </div>
+        <div className="mb-6 flex flex-wrap gap-2">
+          <button
+            onClick={() => setFilterStatus("all")}
+            className={tabClass("all")}
+          >
+            Semua
+          </button>
+          <button
+            onClick={() => setFilterStatus("pending")}
+            className={tabClass("pending")}
+          >
+            Pending
+          </button>
+          <button
+            onClick={() => setFilterStatus("success")}
+            className={tabClass("success")}
+          >
+            Success
+          </button>
+          <button
+            onClick={() => setFilterStatus("failed")}
+            className={tabClass("failed")}
+          >
+            Failed
+          </button>
         </div>
 
         {error && <p className="mb-4 text-red-500">{error}</p>}

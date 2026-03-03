@@ -41,6 +41,12 @@ export function Navbar() {
     };
 
     fetchUserProfile();
+
+    window.addEventListener("user-updated", fetchUserProfile);
+
+    return () => {
+      window.removeEventListener("user-updated", fetchUserProfile);
+    };
   }, []);
 
   useEffect(() => {

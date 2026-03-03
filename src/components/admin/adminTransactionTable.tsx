@@ -26,6 +26,9 @@ export default function AdminTransactionTable({
 }: Props) {
   const [selectedTransaction, setSelectedTransaction] =
     useState<Transaction | null>(null);
+  const [actionLoading, setActionLoading] = useState<
+    "success" | "failed" | null
+  >(null);
 
   return (
     <>
@@ -173,34 +176,67 @@ export default function AdminTransactionTable({
             {selectedTransaction.status === "pending" && (
               <div className="mb-3 flex gap-2">
                 <button
-                  onClick={() =>
-                    onUpdateStatus(
+                  disabled={actionLoading !== null}
+                  onClick={async () => {
+                    setActionLoading("success");
+                    await onUpdateStatus(
                       selectedTransaction.id,
                       "success"
-                    )
-                  }
-                  className="flex-1 rounded bg-green-600 py-2 text-sm text-white"
+                    );
+                    setTimeout(() => {
+                      setActionLoading(null);
+                      setSelectedTransaction(null);
+                    }, 2000);
+                  }}
+                  className={`flex-1 rounded py-2 text-sm text-white ${
+                    actionLoading === "success"
+                      ? "bg-green-700"
+                      : "bg-green-600 hover:bg-green-700"
+                  } ${
+                    actionLoading &&
+                    actionLoading !== "success" &&
+                    "opacity-40"
+                  }`}
                 >
-                  Approved
+                  {actionLoading === "success"
+                    ? "Memproses..."
+                    : "Approve"}
                 </button>
 
                 <button
-                  onClick={() =>
-                    onUpdateStatus(
+                  disabled={actionLoading !== null}
+                  onClick={async () => {
+                    setActionLoading("failed");
+                    await onUpdateStatus(
                       selectedTransaction.id,
                       "failed"
-                    )
-                  }
-                  className="flex-1 rounded bg-red-600 py-2 text-sm text-white"
+                    );
+                    setTimeout(() => {
+                      setActionLoading(null);
+                      setSelectedTransaction(null);
+                    }, 2000);
+                  }}
+                  className={`flex-1 rounded py-2 text-sm text-white ${
+                    actionLoading === "failed"
+                      ? "bg-red-700"
+                      : "bg-red-600 hover:bg-red-700"
+                  } ${
+                    actionLoading &&
+                    actionLoading !== "failed" &&
+                    "opacity-40"
+                  }`}
                 >
-                  Reject
+                  {actionLoading === "failed"
+                    ? "Memproses..."
+                    : "Reject"}
                 </button>
               </div>
             )}
 
             <button
+              disabled={actionLoading !== null}
               onClick={() => setSelectedTransaction(null)}
-              className="w-full rounded bg-gray-400 py-2 text-sm text-white"
+              className="w-full rounded bg-gray-400 py-2 text-sm text-white disabled:opacity-40"
             >
               Tutup
             </button>

@@ -4,6 +4,7 @@ import { Footer } from "@/components/footer";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 import { getMyProfile, updateProfile } from "@/services/user.service";
 import { Toaster, toast } from "sonner";
+import { uploadImage } from "@/services/auth.service";
 
 export default function ProfilePage() {
   useAuthGuard();
@@ -67,24 +68,26 @@ export default function ProfilePage() {
       const token = localStorage.getItem("token");
       if (!token) return;
 
+      let profilePictureUrl: string | undefined;
+
+      if (profilePicture) {
+        profilePictureUrl = await uploadImage(profilePicture);
+      }
+
       await updateProfile({
         token,
         name,
         email,
         phoneNumber,
-        profilePicture,
+        profilePictureUrl,
       });
 
-      toast.success("Profil berhasil diperbarui 🎉", {
-        duration: 3000,
-      });
-
+      toast.success("Profil berhasil diperbarui 🎉", { duration: 3000 });
+      window.dispatchEvent(new Event("user-updated"));
       setOpenModal(false);
       fetchProfile();
     } catch (err: any) {
-      toast.error(err.message || "Gagal memperbarui profil", {
-        duration: 3000,
-      });
+      toast.error(err.message || "Gagal memperbarui profil");
     }
   };
 
