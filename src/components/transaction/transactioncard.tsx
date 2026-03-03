@@ -26,26 +26,26 @@ export function TransactionCard({ transaction }: Props) {
   const item = transaction.transaction_items?.[0];
 
   return (
-    <div className="bg-[#7D8D86] rounded-xl shadow-sm p-5 grid gap-4 md:grid-cols-[2fr_1fr_1fr_auto] md:items-center hover:shadow-md transition">
+    <div className="bg-[#F1F0E4] rounded-xl shadow-sm p-5 grid gap-4 md:grid-cols-[2fr_1fr_1fr_auto] md:items-center hover:shadow-md transition">
       <div className="flex gap-4 items-center">
         <Picture
           src={item?.imageUrl}
           alt={item?.name}
-          className="w-16 h-16 text-[#F1F0E4] rounded-lg object-cover border"
+          className="w-16 h-16  rounded-lg object-cover border"
         />
 
         <div>
-          <p className="font-sans text-[#F1F0E4]">
+          <p className="font-sans text-[#7D8D86]">
             {transaction.invoiceId}
           </p>
-          <p className="text-sm text-[#F1F0E4]">
+          <p className="text-sm text-[#7D8D86]">
             {new Date(transaction.createdAt).toLocaleDateString("id-ID", {
               day: "2-digit",
               month: "long",
               year: "numeric",
             })}
           </p>
-          <p className="text-sm text-[#F1F0E4]">
+          <p className="text-sm text-[#7D8D86]">
             {transaction.payment_method.name}
           </p>
         </div>
@@ -60,7 +60,7 @@ export function TransactionCard({ transaction }: Props) {
                 ? "bg-green-500"
                 : transaction.status === "failed"
                   ? "bg-red-600"
-                  : "bg-gray-400"
+                  : "bg-red-700"
           }`}
         />
         <span className="text-sm font-medium">
@@ -74,7 +74,7 @@ export function TransactionCard({ transaction }: Props) {
         </span>
       </div>
 
-      <div className="font-semibold text-[#F1F0E4] md:text-right">
+      <div className="font-bold text-[#7D8D86]  md:text-right">
         Rp {transaction.totalAmount.toLocaleString("id-ID")}
       </div>
       <div />
