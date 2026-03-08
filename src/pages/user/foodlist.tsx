@@ -139,6 +139,12 @@ export default function FoodListPage() {
       } else {
         await unlikeFood(foodId, { token });
       }
+          toast.success(
+      !isLike ? "Ditambahkan ke favorite ❤️" : "Dihapus dari favorite 🤍",
+      {
+        duration: 2000,
+      },
+    );
     } catch {
       setFoods((prev) =>
         prev.map((food) => (food.id === foodId ? { ...food, isLike } : food)),
