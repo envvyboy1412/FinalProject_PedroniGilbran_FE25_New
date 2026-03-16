@@ -106,53 +106,80 @@ export default function FoodForm({
           {mode === "edit" ? "Edit Food" : "Tambah Food"}
         </h2>
 
-        {error && <p className="mb-3 text-sm text-red-500">{error}</p>}
-
-        <input
-          className="w-full mb-3 rounded px-3 py-2 bg-[#F1F0E4] text-[#BCA88D]"
-          placeholder="Nama Makanan"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-
-        <textarea
-          className="w-full mb-3 rounded px-3 py-2 bg-[#F1F0E4] text-[#BCA88D]"
-          placeholder="Deskripsi"
-          rows={3}
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-
-        <input
-          className="w-full mb-3 rounded px-3 py-2 bg-[#F1F0E4] text-[#BCA88D]"
-          placeholder="Ingredients"
-          value={ingredients}
-          onChange={(e) => setIngredients(e.target.value)}
-        />
-
-        <input
-          type="number"
-          className="w-full mb-3 rounded px-3 py-2 bg-[#F1F0E4] text-[#BCA88D]"
-          placeholder="Harga"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-        />
-
-        <label className="block mb-4 cursor-pointer">
-          <div className="h-40 rounded-lg border-2 border-dashed bg-gray-50 flex items-center justify-center">
-            {preview ? (
-              <img src={preview} className="h-full w-full object-cover rounded-lg" />
-            ) : (
-              <span className="text-gray-500 text-sm">Upload Gambar</span>
-            )}
+        {error && (
+          <div className="mb-4 flex items-center justify-center gap-2 rounded-md bg-red-100 px-3 py-2 text-sm font-medium text-red-600">
+            <span>⚠️</span>
+            <span>{error}</span>
           </div>
+        )}
+
+        <div className="mb-4">
+          <label className="block text-sm mb-1 text-[#F1F0E4]">
+            Nama Makanan
+          </label>
           <input
-            type="file"
-            className="hidden"
-            accept="image/*"
-            onChange={(e) => handleImageChange(e.target.files?.[0] || null)}
+            className="w-full rounded px-3 py-2 bg-[#F1F0E4] text-[#3E3F29]"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
           />
-        </label>
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-sm mb-1 text-[#F1F0E4]">Deskripsi</label>
+          <textarea
+            rows={3}
+            className="w-full rounded px-3 py-2 bg-[#F1F0E4] text-[#3E3F29]"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-sm mb-1 text-[#F1F0E4]">
+            Ingredients
+          </label>
+          <input
+            className="w-full rounded px-3 py-2 bg-[#F1F0E4] text-[#3E3F29]"
+            value={ingredients}
+            onChange={(e) => setIngredients(e.target.value)}
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-sm mb-1 text-[#F1F0E4]">Harga</label>
+          <input
+            type="number"
+            className="w-full rounded px-3 py-2 bg-[#F1F0E4] text-[#3E3F29]"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-sm mb-2 text-[#F1F0E4]">
+            Upload Gambar
+          </label>
+
+          <label className="cursor-pointer">
+            <div className="h-40 rounded-lg border-2 border-dashed bg-gray-50 flex items-center justify-center">
+              {preview ? (
+                <img
+                  src={preview}
+                  className="h-full w-full object-cover rounded-lg"
+                />
+              ) : (
+                <span className="text-gray-500 text-sm">Pilih Gambar</span>
+              )}
+            </div>
+
+            <input
+              type="file"
+              className="hidden"
+              accept="image/*"
+              onChange={(e) => handleImageChange(e.target.files?.[0] || null)}
+            />
+          </label>
+        </div>
 
         <div className="flex justify-end gap-2">
           <button
