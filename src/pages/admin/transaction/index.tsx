@@ -7,6 +7,7 @@ import {
 } from "@/services/transaction.service";
 import AdminTransactionTable from "@/components/admin/adminTransactionTable";
 import { toast, Toaster } from "sonner";
+import AdminLayout from "@/components/layout/AdminLayout";
 
 type Transaction = {
   id: string;
@@ -123,19 +124,13 @@ export default function AdminTransactionPage() {
     }`;
 
   return (
-    <main className="min-h-screen bg-[#3E3F29] p-4 md:p-6">
+    <AdminLayout>
       <div className="mx-auto max-w-6xl rounded-2xl bg-[#7D8D86] p-4 md:p-6">
         <div className="mb-6 flex flex-col md:flex-row gap-3 justify-between">
           <h1 className="text-xl font-semibold text-[#F1F0E4]">
             Manajemen Transaksi
           </h1>
 
-          <button
-            onClick={() => router.push("/admin")}
-            className="rounded-lg bg-[#F1F0E4] px-4 py-2 text-sm font-semibold text-[#3A2F24]"
-          >
-            Kembali
-          </button>
         </div>
 
         <div className="mb-6 flex flex-wrap gap-2">
@@ -209,6 +204,6 @@ export default function AdminTransactionPage() {
         )}
       </div>
       <Toaster position="top-right" richColors />
-    </main>
+    </AdminLayout>
   );
 }

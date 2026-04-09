@@ -4,6 +4,7 @@ import { useAuthGuard } from "@/hooks/useAuthGuard";
 import { getFoods, adminDeleteFood } from "@/services/food.service";
 import FoodForm from "@/components/admin/foodform";
 import { toast, Toaster } from "sonner";
+import AdminLayout from "@/components/layout/AdminLayout";
 
 type Food = {
   ingredients: string[];
@@ -78,7 +79,7 @@ export default function AdminFoodPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#3E3F29] p-4 md:p-6">
+    <AdminLayout>
       <div className="max-w-6xl mx-auto bg-[#7D8D86] rounded-2xl shadow-2xl p-4 md:p-6">
         <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-3 mb-6">
           <h1 className="text-xl font-semibold text-[#F1F0E4]">
@@ -86,12 +87,6 @@ export default function AdminFoodPage() {
           </h1>
 
           <div className="flex flex-col sm:flex-row gap-2">
-            <button
-              onClick={() => router.push("/admin")}
-              className="px-4 py-2 rounded-lg bg-[#F1F0E4] text-[#3A2F24] font-semibold"
-            >
-              Kembali
-            </button>
 
             <button
               onClick={() => setShowForm(true)}
@@ -272,6 +267,6 @@ export default function AdminFoodPage() {
       )}
 
       <Toaster position="top-right" richColors />
-    </main>
+    </AdminLayout>
   );
 }

@@ -7,6 +7,7 @@ import {
   getMyProfile,
 } from "@/services/user.service";
 import { toast, Toaster } from "sonner";
+import AdminLayout from "@/components/layout/AdminLayout";
 
 type User = {
   id: string;
@@ -114,7 +115,7 @@ export default function AdminUsersPage() {
   }, [search]);
 
   return (
-    <main className="min-h-screen bg-[#3E3F29] p-4 md:p-6">
+    <AdminLayout>
       <div className="mx-auto max-w-6xl rounded-2xl bg-[#7D8D86] p-4 md:p-6 shadow-2xl">
         <div className="mb-6 flex flex-col md:flex-row gap-3 justify-between">
           <h1 className="text-xl font-semibold text-[#F1F0E4]">
@@ -130,12 +131,6 @@ export default function AdminUsersPage() {
               className="rounded-lg bg-[#F1F0E4] px-4 py-2 text-sm text-[#3A2F24]"
             />
 
-            <button
-              onClick={() => router.push("/admin")}
-              className="rounded-lg bg-[#F1F0E4] px-4 py-2 text-sm font-semibold text-[#3A2F24]"
-            >
-              Kembali
-            </button>
           </div>
         </div>
 
@@ -262,6 +257,6 @@ export default function AdminUsersPage() {
         )}
       </div>
       <Toaster position="top-center" richColors />
-    </main>
+    </AdminLayout>
   );
 }
